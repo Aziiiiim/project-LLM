@@ -1,0 +1,55 @@
+{
+    "node_types" : [
+        {   "label": "Recipe", 
+            "properties": [
+                "name", "description", 
+                "prep_time", "cook_time", 
+                "servings"
+            ]
+        },
+        {
+            "label": "Ingredient", 
+            "properties": [
+                "name", 
+                "quantity", 
+                "unit"
+            ]
+        },
+        {
+            "label": "Cuisine Type", 
+            "properties": ["name"]
+        },
+        {
+            "label": "DietaryRestriction", 
+            "properties": ["name"]
+        },
+        {
+            "label": "CookingMethod", 
+            "properties": ["name"]
+        },
+        {
+            "label": "FlavorProfile", 
+            "properties": ["name"]
+        },
+        {
+            "label": "MealType", 
+            "properties": ["name"]
+        },
+        {
+            "label": "Occasion", 
+            "properties": ["name"]
+        },
+        {
+            "label": "Author", 
+            "properties": ["name"]
+        }
+    ],
+    "relationship_types": [
+        "INGREDIENT_OF",
+        "AUTHOR_OF"
+    ],
+    "patterns" : [
+        ["Ingredient", "INGREDIENT_OF", "Recipe"],
+        ["Author", "AUTHOR_OF", "Recipe"]
+    ]
+}
