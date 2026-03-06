@@ -1,54 +1,33 @@
 {
-    "node_types" : [
-        {   "label": "Recipe", 
+    "node_types": [
+        {
+            "label": "Recipe",
             "properties": [
-                "name", "description", 
-                "prep_time", "cook_time", 
-                "servings"
+                {"name": "name", "type": "STRING"},
+                {"name": "description", "type": "STRING"},
+                {"name": "prep_time", "type": "STRING"},
+                {"name": "cook_time", "type": "STRING"},
+                {"name": "servings", "type": "INTEGER"}
             ]
         },
         {
-            "label": "Ingredient", 
+            "label": "Ingredient",
             "properties": [
-                "name", 
-                "quantity", 
-                "unit"
+                {"name": "name", "type": "STRING", "required": true},
+                {"name": "quantity", "type": "FLOAT", "required": true},
+                {"name": "unit", "type": "STRING", "required": true}
             ]
         },
-        {
-            "label": "Cuisine Type", 
-            "properties": ["name"]
-        },
-        {
-            "label": "DietaryRestriction", 
-            "properties": ["name"]
-        },
-        {
-            "label": "CookingMethod", 
-            "properties": ["name"]
-        },
-        {
-            "label": "FlavorProfile", 
-            "properties": ["name"]
-        },
-        {
-            "label": "MealType", 
-            "properties": ["name"]
-        },
-        {
-            "label": "Occasion", 
-            "properties": ["name"]
-        },
-        {
-            "label": "Author", 
-            "properties": ["name"]
-        }
+        { "label": "Cuisine Type", "properties": [{"name": "name", "type": "STRING"}] },
+        { "label": "DietaryRestriction", "properties": [{"name": "name", "type": "STRING"}] },
+        { "label": "CookingMethod", "properties": [{"name": "name", "type": "STRING"}] },
+        { "label": "FlavorProfile", "properties": [{"name": "name", "type": "STRING"}] },
+        { "label": "MealType", "properties": [{"name": "name", "type": "STRING"}] },
+        { "label": "Occasion", "properties": [{"name": "name", "type": "STRING"}] },
+        { "label": "Author", "properties": [{"name": "name", "type": "STRING"}] }
     ],
-    "relationship_types": [
-        "INGREDIENT_OF",
-        "AUTHOR_OF"
-    ],
-    "patterns" : [
+    "relationship_types": ["INGREDIENT_OF", "AUTHOR_OF"],
+    "patterns": [
         ["Ingredient", "INGREDIENT_OF", "Recipe"],
         ["Author", "AUTHOR_OF", "Recipe"]
     ]
