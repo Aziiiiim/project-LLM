@@ -1,15 +1,16 @@
 services:
   neo4j:
     image: neo4j:latest
-    volumes:
-      - neo4j_data:/data
     environment:
         - NEO4J_AUTH=neo4j/your_password
         - NEO4J_PLUGINS=["apoc"] # https://github.com/langchain-ai/langchain/issues/12901
     ports:
       - "7474:7474"
       - "7687:7687"
-    restart: always
+    restart: on-failure
+    volumes:
+      - neo4j_data:/data
+      - ./neo4j_init:/neo4j_init
 
 volumes:
   neo4j_data:
