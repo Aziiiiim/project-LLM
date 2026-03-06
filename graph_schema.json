@@ -18,6 +18,12 @@
                 {"name": "unit", "type": "STRING", "required": true}
             ]
         },
+        {
+            "label": "Utensil",
+            "properties": [
+                {"name": "name", "type": "STRING", "required": true}
+            ]
+        },
         { "label": "Cuisine Type", "properties": [{"name": "name", "type": "STRING"}] },
         { "label": "DietaryRestriction", "properties": [{"name": "name", "type": "STRING"}] },
         { "label": "CookingMethod", "properties": [{"name": "name", "type": "STRING"}] },
@@ -26,9 +32,16 @@
         { "label": "Occasion", "properties": [{"name": "name", "type": "STRING"}] },
         { "label": "Author", "properties": [{"name": "name", "type": "STRING"}] }
     ],
-    "relationship_types": ["INGREDIENT_OF", "AUTHOR_OF"],
+    "relationship_types": ["INGREDIENT_OF", "AUTHOR_OF","USED_IN", "CLASSIFIES", "APPLIES_TO", "DESCRIBES", "SUITABLE_FOR"],
     "patterns": [
         ["Ingredient", "INGREDIENT_OF", "Recipe"],
-        ["Author", "AUTHOR_OF", "Recipe"]
+        ["Author", "AUTHOR_OF", "Recipe"],
+        ["Utensil", "USED_IN", "Recipe"],
+        ["Cuisine Type", "CLASSIFIES", "Recipe"],
+        ["DietaryRestriction", "APPLIES_TO", "Recipe"],
+        ["CookingMethod", "USED_IN", "Recipe"],
+        ["FlavorProfile", "DESCRIBES", "Recipe"],
+        ["MealType", "CLASSIFIES", "Recipe"],
+        ["Occasion", "SUITABLE_FOR", "Recipe"]
     ]
 }

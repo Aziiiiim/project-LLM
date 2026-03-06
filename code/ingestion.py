@@ -27,10 +27,7 @@ def create_kg_builder() -> SimpleKGPipeline:
         schema={
             "node_types": schema["node_types"],
             "relationship_types": schema["relationship_types"],
-            "patterns": [
-                ("Ingredient", "INGREDIENT_OF", "Recipe"),
-                ("Author", "AUTHOR_OF", "Recipe")
-            ],
+            "patterns": schema["patterns"],
             "additional_node_types": False,         # Only allow labels in NODE_TYPES
             "additional_relationship_types": False, # Only allow types in REL_TYPES
             "additional_patterns": False
