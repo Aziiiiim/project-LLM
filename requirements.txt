@@ -10,3 +10,4 @@ python-dotenv>=1.2.1
 
 neo4j
 fastmcp==3.1.0
+beautifulsoup4
