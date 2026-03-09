@@ -5,12 +5,9 @@ import {
   type UIMessage,
 } from "ai";
 
-const { loadEnvFile } = require('node:process');
-loadEnvFile('../.env'); // Loads .env from parent directory
-
 const MODEL_NAME = process.env.AI_MODEL ?? "gpt-5-nano";
 console.log("Using model:", MODEL_NAME);
-const API_ENDPOINT = process.env.AI_ENDPOINT;
+const API_ENDPOINT = process.env.AI_ENDPOINT ?? "http://localhost:8000/message";
 
 function extractAssistantText(payload: unknown): string {
   if (typeof payload === "string") {
@@ -49,7 +46,7 @@ export async function POST(req: Request) {
   } = await req.json();
 
   try {
-    const backendResponse = await fetch("http://localhost:8000/message", {
+    const backendResponse = await fetch(API_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

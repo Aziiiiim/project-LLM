@@ -11,3 +11,6 @@ def receive_message():
     print("Received message:", data)
     sleep(2)  # Simulate processing time
     return jsonify("This is a response from the backend!")
+
+if __name__ == "__main__":
+    app.run(debug=False, host='0.0.0.0', port=8000)
