@@ -13,13 +13,9 @@ services:
       - ./neo4j_init:/neo4j_init
 
   backend:
-    build:
-      context: .
-      dockerfile: ./backend/Dockerfile
+    build: ./backend
     env_file:
       - ./.env
-    ports:
-      - "8000:8000"
     restart: always
     depends_on:
       - neo4j
@@ -28,6 +24,8 @@ services:
     build: ./cookassistant-ui
     env_file:
       - ./.env
+    environment:
+      - VITE_BACKEND_URL=http://backend:8000
     ports:
       - "5173:5173"
     restart: on-failure

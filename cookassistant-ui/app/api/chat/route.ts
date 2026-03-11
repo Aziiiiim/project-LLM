@@ -7,7 +7,8 @@ import {
 
 const MODEL_NAME = process.env.AI_MODEL ?? "gpt-5-nano";
 console.log("Using model:", MODEL_NAME);
-const API_ENDPOINT = process.env.AI_ENDPOINT ?? "http://localhost:8000/message";
+const VITE_BACKEND_URL = process.env.VITE_BACKEND_URL ?? "http://localhost:8000/message";
+console.log("Using backend URL:", VITE_BACKEND_URL);
 
 function extractAssistantText(payload: unknown): string {
   if (typeof payload === "string") {
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
   } = await req.json();
 
   try {
-    const backendResponse = await fetch(API_ENDPOINT, {
+    const backendResponse = await fetch(VITE_BACKEND_URL + "/message", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
