@@ -5,6 +5,7 @@ from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langchain_openai import ChatOpenAI
 from langchain_neo4j import Neo4jGraph, GraphCypherQAChain
 from langchain_core.tools import tool
+from langchain_community.callbacks import get_openai_callback
 
 
 ### REFERENCES ###
@@ -12,6 +13,7 @@ from langchain_core.tools import tool
 # https://medium.com/data-science/integrating-neo4j-into-the-langchain-ecosystem-df0e988344d2
 # https://medium.com/data-science/langchain-has-added-cypher-search-cb9d821120d5
 
+### INITIALIZATIONS ###
 
 load_dotenv()
 
@@ -32,29 +34,38 @@ model = ChatOpenAI(
 )
 
 chain = GraphCypherQAChain.from_llm(
-    model, graph=graph,
-    verbose=True,
+    model,
+    graph=graph,
+    verbose=False,
     allow_dangerous_requests=True,
-    # graph_schema=graph.get_schema,
-    return_intermediate_steps=True,
+    return_intermediate_steps=False,
     # cypher_query_corrector=None,
 )
+
+### TOOLS ###
 
 @tool
 def query_neo4j(query: str):
     "Use this tool to query the Neo4j database with natural language questions."
     try:
         result = chain.invoke(query)
-        print("Result", result)
+        # query = result.get("query", "No query found")
+        # print("Result: ", result)
         return result.get("result", "No result found")
     except Exception as e:
         return f"Error: {str(e)}"
 
-system_message = SystemMessage(content=f"""
-You are a Neo4j database expert. Use the {query_neo4j.name} tool to answer questions.
 
-Database Schema context: 
-{graph.get_schema}
+### PROMPT ###
+
+# After some testing, it turned out including the database schema in this context was not efficient, as
+# - the schema is already included in the chain
+# - it requires a lot more tokens for each query (about 600+), plus slows down the request
+# - the results were pretty much the same
+
+system_message = SystemMessage(
+    content=f"""
+You are a Neo4j database expert. Use the {query_neo4j.name} tool to answer questions.
 
 Guidelines:
 - Always check the schema carefully before querying
@@ -65,13 +76,16 @@ If a query fails or returns unexpected results:
 2. Verify property names and relationships exist in the schema
 3. Try simpler queries first, then build complexity
 4. Use modern Cypher syntax (e.g., COUNT() instead of SIZE() for aggregations)
-""")
-# TODO: Make tests to see if keeping the schema here improves performance
-# (Since it is quite large, it slows down the model a lot, and the Chain should already have access to it)
+"""
+)
 
-agent = create_agent(model, tools=[query_neo4j], system_prompt=system_message)
-
-# TODO: Add FewShot templates (examples)
+# TODO: include few shots ? Need to check token usage
+examples = [
+    {
+        "question": "What are the 5 movies with the highest ratings?",
+        "cypher": "MATCH (m:Movie) WHERE m.imdbRating IS NOT NULL RETURN m.title AS title, m.imdbRating AS rating ORDER BY m.imdbRating DESC LIMIT 5",
+    },
+]
 
 def get_tool_calls(model_response):
     tool_calls = []
@@ -80,19 +94,43 @@ def get_tool_calls(model_response):
             tool_calls.extend(msg.tool_calls)
     return tool_calls
 
-### EXAMPLES ###
+def invoke_agent(agent, question):
+    with get_openai_callback() as cb:
+        response = agent.invoke({"messages": [HumanMessage(content=question)]})
+        print(f"Total tokens used: {cb.total_tokens}")
+    print(f"Tool calls: {len(get_tool_calls(response))}")
+    print(f"Response: {response['messages'][-1].content}")
+    print("-" * 50 + "\n")
+
+
+### TESTS ###
 questions = [
     "What are the 5 movies with the highest ratings?",
-    "What are the top 10 movies with highest number of connections?", # fails because of outdated syntax -> use COUNT instead of SIZE
+    "What are the top 10 movies with highest number of connections?",
     "What are 6 movies with Leonardo DiCaprio? Only return the names",
-    "Give me the title and length (not null) of the 5 longest movies in the database."
+    "Give me the title and length (not null) of the 5 longest movies in the database.",
 ]
 
-# TODO: make it interactive
-for question in questions[:1]:
-    print(f"Question: {question}")
-    # chain.invoke(question)
-    response = agent.invoke({"messages": [HumanMessage(content=question)]})
-    print(f"Response: {response["messages"][-1].content}")
-    print(f"Tool calls: {len(get_tool_calls(response))}")
-    print("-"*50+"\n")
+### TRACK CONVERSATION HISTORY ###
+# memory = ConversationBufferMemory(
+#     memory_key="chat_history",
+#     return_messages=True
+# )
+
+
+def interactive_mode():
+    print("Neo4j Chat Agent (type 'exit' to quit)")
+    agent = create_agent(model, tools=[query_neo4j], system_prompt=system_message)
+
+    while True:
+        question = input("\nYou: ").strip()
+        if question.lower() in ["exit", "quit"]:
+            break
+
+        invoke_agent(agent, question)
+
+        # # Optional: Show generated Cypher
+        # if input("Show Cypher? (y/n): ").lower() == "y":
+        #     pass
+
+interactive_mode()
