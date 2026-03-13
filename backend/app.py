@@ -24,7 +24,7 @@ def receive_message():
         data['model_name']
     )
 
-def serialize_response(response : list[dict]):
+def serialize_response(response : list[dict]) -> list[BaseMessage]:
     messages = []
     for msg in response:
         if msg['role'] == 'user':
@@ -36,7 +36,7 @@ def serialize_response(response : list[dict]):
     return messages
 
 
-def main(messages, model_name:str):
+def main(messages: list[BaseMessage], model_name:str):
     model = ChatOpenAI(
         model=model_name,
         base_url=os.getenv("AI_ENDPOINT"),
