@@ -6,6 +6,8 @@ from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import BaseMessage
 
+from .text_to_cypher import AgentQuery
+
 @tool("query", description="Queries the database and returns the most accurate subgraph to the question")
 def call_query_agent(agent, query: str):
     result = agent.invoke({"messages": [{"role": "user", "content": query}]})
@@ -20,7 +22,7 @@ def main(messages: list[BaseMessage], model_name:str):
     )
     query_agent = partial(
         call_query_agent,
-        agent=create_agent(model=model, tools=[])
+        agent=AgentQuery()
     )
     main_agent = create_agent(
         model=model,
