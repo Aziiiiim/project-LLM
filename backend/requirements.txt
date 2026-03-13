@@ -1,0 +1,21 @@
+# LangChain packages
+langchain-openai>=1.1.0
+langchain-core>=1.1.0
+langchain>=1.1.0
+langchain-mcp-adapters>=0.1.14
+langchain-neo4j>=0.8.0
+langchain-community>=0.4.1
+
+# Utilities
+python-dotenv>=1.2.1
+
+neo4j
+fastmcp==3.1.0
+
+#Backend
+flask==3.1.3
+flask-cors==6.0.2
+gunicorn==25.1.0
+
+#Scraping agent
+beautifulsoup4
