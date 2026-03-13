@@ -5,8 +5,6 @@ import {
   type UIMessage,
 } from "ai";
 
-const MODEL_NAME = process.env.AI_MODEL ?? "gpt-5-nano";
-console.log("Using model:", MODEL_NAME);
 const VITE_BACKEND_URL = process.env.VITE_BACKEND_URL ?? "http://localhost:8000/message";
 console.log("Using backend URL:", VITE_BACKEND_URL);
 
@@ -41,9 +39,11 @@ export async function POST(req: Request) {
   const {
     messages,
     system,
+    model
   }: {
     messages: UIMessage[];
     system?: string;
+    model?: string;
   } = await req.json();
 
   try {
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: MODEL_NAME,
+        model: model,
         messages: await convertToModelMessages(messages),
         system,
       }),
