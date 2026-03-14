@@ -1,4 +1,3 @@
-from functools import partial
 import os
 
 from langchain.tools import tool
@@ -7,30 +6,30 @@ from langchain_openai import ChatOpenAI
 from langchain_core.messages import BaseMessage
 
 from .text_to_cypher import AgentQuery
+class MultiAgent:
+    def __init__(self, model_name:str):
+        self.model = ChatOpenAI(
+            model=model_name, 
+            base_url=os.getenv("AI_ENDPOINT"),
+            api_key=os.getenv("AI_API_KEY"),
+        )
+        self.query_agent = AgentQuery()
 
-@tool("query", description="Queries the database and returns the most accurate subgraph to the question")
-def call_query_agent(agent, query: str):
-    result = agent.invoke({"messages": [{"role": "user", "content": query}]})
-    return result["messages"][-1].content
+        #### TOOLS ####
+        @tool("query", description="Queries the database and returns the most accurate subgraph to the question")
+        def call_query_agent(query: str):
+            result = self.query_agent.invoke({"messages": [{"role": "user", "content": query}]})
+            return result["messages"][-1].content
 
+        ##############
 
-def main(messages: list[BaseMessage], model_name:str):
-    model = ChatOpenAI(
-        model=model_name, 
-        base_url=os.getenv("AI_ENDPOINT"),
-        api_key=os.getenv("AI_API_KEY"),
-    )
-    query_agent = partial(
-        call_query_agent,
-        agent=AgentQuery()
-    )
-    main_agent = create_agent(
-        model=model,
-        tools=[
-            query_agent,
-        ]
-    )
-    
-    result = main_agent.invoke({"messages": messages})
+        self.main_agent = create_agent(
+            model=self.model,
+            tools=[
+                call_query_agent,
+            ]
+        )
 
-    return result["messages"][-1].content
+    def run(self, messages: list[BaseMessage]):
+        result = self.main_agent.invoke({"messages": messages[-1]})
+        return result["messages"][-1].content

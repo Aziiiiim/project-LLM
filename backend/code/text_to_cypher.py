@@ -19,7 +19,7 @@ load_dotenv()
 
 def _build_graph():
     graph = Neo4jGraph(
-        url=os.environ.get("NEO4J_URL"),
+        url="bolt://neo4j:7687",
         username=os.environ.get("NEO4J_USERNAME"),
         password=os.getenv("NEO4J_PASSWORD"),
         sanitize=True, # Used to remove embedding-like properties (long lists) to not exceed the token limit

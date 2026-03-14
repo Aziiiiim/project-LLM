@@ -19,7 +19,7 @@ def create_kg_builder() -> SimpleKGPipeline:
             raise ValueError("Schema must contain 'node_types', 'relationship_types' and 'patterns' keys")
 
     driver = GraphDatabase.driver(
-        os.getenv("NEO4J_URL",""), 
+        "bolt://neo4j:7687", 
         auth=(os.getenv("NEO4J_USERNAME",""), os.getenv("NEO4J_PASSWORD",""))
     )
     return SimpleKGPipeline(

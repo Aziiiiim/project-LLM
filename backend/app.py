@@ -7,7 +7,7 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, Base
 import logging
 import sys
 
-from code.main_agent import main
+from code.main_agent import MultiAgent
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger('myapp')
@@ -19,20 +19,20 @@ CORS(app, resources={r"/*": {"origins": ["http://localhost:3000"]}})
 def receive_message():
     data = request.get_json()
     logger.info("Received message: %s", data)
-    return jsonify(main(
-        serialize_response(data['messages']),
-        data['model_name']
+    agent = MultiAgent(model_name=data['model'])
+    return jsonify(agent.run(
+        serialize_response(data['messages'])
     ))
 
 def serialize_response(response : list[dict]) -> list[BaseMessage]:
     messages = []
     for msg in response:
         if msg['role'] == 'user':
-            messages.append(HumanMessage(content=msg['content']['text']))
+            messages.append(HumanMessage(content=msg['content'][0]['text']))
         elif msg['role'] == 'assistant':
-            messages.append(AIMessage(content=msg['content']['text']))
+            messages.append(AIMessage(content=msg['content'][0]['text']))
         elif msg['role'] == 'system':
-            messages.append(SystemMessage(content=msg['content']['text']))
+            messages.append(SystemMessage(content=msg['content'][0]['text']))
     return messages
 
 if __name__ == "__main__":
