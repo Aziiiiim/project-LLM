@@ -60,6 +60,7 @@ async def ingest(kg_builder: SimpleKGPipeline, file_path: str):
     with open(file_path, "r") as f:
         text = f.read()
     await kg_builder.run_async(text=text)
+    
 
 if __name__ == "__main__":
     # Tutorial : test with a simple recipe text file. 

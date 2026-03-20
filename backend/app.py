@@ -20,7 +20,7 @@ def receive_message():
     data = request.get_json()
     logger.info("Received message: %s", data)
     agent = MultiAgent(model_name=data['model'])
-    return jsonify(agent.run(
+    return jsonify(agent.invoke(
         serialize_response(data['messages'])
     ))
 
