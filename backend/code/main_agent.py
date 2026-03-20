@@ -1,4 +1,5 @@
 import os
+import logging
 
 from langchain.tools import tool
 from langchain.agents import create_agent
@@ -14,11 +15,14 @@ class MultiAgent:
             api_key=os.getenv("AI_API_KEY"),
         )
         self.query_agent = AgentQuery()
+        self.logger = logging.getLogger(__name__)
 
         #### TOOLS ####
         @tool("query", description="Queries the database and returns the most accurate subgraph to the question")
         def call_query_agent(query: str):
-            result = self.query_agent.invoke({"messages": [{"role": "user", "content": query}]})
+            self.logger.info("[QUERY AGENT] Calling...")
+            result = self.query_agent.invoke(query)
+            self.logger.info(f"[QUERY AGENT] Result: {result}")
             return result["messages"][-1].content
 
         ##############
@@ -30,6 +34,8 @@ class MultiAgent:
             ]
         )
 
-    def run(self, messages: list[BaseMessage]):
+    def invoke(self, messages: list[BaseMessage]):
+        self.logger.info(f"Multi agent received message: {messages}")
         result = self.main_agent.invoke({"messages": messages[-1]})
+        # We could also put all messages to keep history context
         return result["messages"][-1].content
