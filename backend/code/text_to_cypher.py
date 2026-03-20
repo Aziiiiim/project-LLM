@@ -1,4 +1,5 @@
 import os
+import logging
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
@@ -127,6 +128,8 @@ class AgentQuery:
         system_message = _get_system_message(self.query_tool.name)
         self.chain = _build_chain(model, graph)
         self.agent = create_agent(model, tools=[self.query_tool], system_prompt=system_message)
+        self.logger = logging.getLogger(__name__)
+        self.logger.propagate = True  # Ensure logs propagate to root logger
 
     ### TOOLS ###
 
@@ -149,11 +152,13 @@ class AgentQuery:
         return query_neo4j
 
     def invoke(self, question: str):
-        print(f"Question: {question}")
+        # print(f"Question: {question}")
         with get_openai_callback() as cb:
             response = self.agent.invoke({"messages": [HumanMessage(content=question)]})
             print(f"Total tokens used: {cb.total_tokens}")
-        print(f"Tool calls: {len(get_tool_calls(response))}")
-        print(f"Response: {response['messages'][-1].content}")
-        print("-" * 50 + "\n")
+        # print(f"Tool calls: {len(get_tool_calls(response))}")
+        # print(f"Response: {response['messages'][-1].content}")
+        # print("-" * 50 + "\n")
+        self.logger.info(f"Response from the query agent: {response['messages'][-1].content}")
+        return response
 

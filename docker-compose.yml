@@ -16,7 +16,7 @@ services:
     build: ./backend
     env_file:
       - ./.env
-    restart: always
+    restart: on-failure
     depends_on:
       - neo4j
 
