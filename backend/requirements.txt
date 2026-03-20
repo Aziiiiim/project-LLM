@@ -18,4 +18,4 @@ flask-cors==6.0.2
 gunicorn==25.1.0
 
 #Scraping agent
-beautifulsoup4
+beautifulsoup4==4.14.3
