@@ -8,5 +8,5 @@ WORKDIR /app
 COPY . .
 RUN python -m pip install -r ./requirements.txt
 
-CMD ["python", "-m", "gunicorn", "-b", "0.0.0.0:8000", "app:app"]
+CMD ["python", "-m", "gunicorn", "-b", "0.0.0.0:8000", "--timeout", "3600", "app:app"]
 
