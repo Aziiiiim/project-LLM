@@ -1,37 +1,41 @@
-# project-LLM
+# Project LLM - Cook Assistant
 
-## TODO
+## General Description
 
-### A faire
-- Avoir un jeu de poker fonctionnel à partir du code de [Pokerkit](https://github.com/uoftcprg/pokerkit)
-- Envoyer les données de la partie en cours à un autre service qu'on va créer 
-- Avoir un frontend qui s'ajoute au jeu  
-- FunctionCalling qui prend en entrée un json contenant l'état actuel du jeu et renvoie ce qu'on lui demande. En première étape, seulement le meilleur coup et ensuite, on pourra personnaliser.
-- Plusieurs modes d'aides (prudent, standard, risqué)
-- Avoir l'outil qui permet d'avoir la/les probabilités d'une main.
-- Stocker les données d'une partie dans un JSON
+This project is a cooking assistant built with a multi-agent LLM architecture.
 
-### Pour aller plus loin
-- Proposer une mise en fonction du comportement
-- Detection de comportements adverses et comment y réagir
+- `backend/` is a Flask API with a router agent (`MultiAgent`) that decides when to use:
+  - `AgentQuery` for Neo4j graph/database questions (text-to-Cypher flow),
+  - `AgentScraping` for recipe search/scraping and ingestion.
+- `cookassistant-ui/` is a Next.js chat UI.
+- Neo4j is used as the knowledge graph database.
 
-### Evaluation
-- Range de proba -> coups possibles/acceptés
-- Ajoute une règle :
+Typical request flow:
+1. The frontend sends a chat request to `POST /message`.
+2. The backend routes the request to the right agent/tool.
+3. The final answer is returned to the frontend.
 
-    Si p(win)>mise/pot+mise -> Call/Bet autorisé
-    Sinon -> Fold autorisé
+### What the agent can do
 
-    Taux de décisions EV-positives
-    On compte :
-        % de fois où le LLM choisit une action avec EV > 0
-        % de fois où il choisit une action EV < 0
-    
-- Calculer l'EV de chaque coup (bet, call, fold), prendre l'EV optimal et prendre l'EV du LLM et calculer un regret = EV(max) - EV(LLM)
-- Faire X parties et calculer la moyenne des stats 
+- Route each request to the most relevant tool (`query` or `scrape_recipe`) through `MultiAgent`.
+- Answer graph/database questions by translating natural language into Neo4j queries (`AgentQuery`).
+- Search JoCooks recipes from a dish name or ingredient-based request (`AgentScraping`).
+- Scrape a recipe page and return a clean result (title, source, ingredients, instructions).
+- Ingest scraped recipe content into Neo4j so it can be reused in later graph queries.
+- Provide a direct conversational answer when no specialized tool is needed.
 
-## Répartition
+## Setup
 
-Personne 1 : PokerKit/Pypoker et Chercher frontend, connecter tout ça, pouvoir faire une partie + envoyer les données 
-Personne 2 : Préparer tous les modéles de question et de réponses à l'IA. Prompt Engineering. Regarder d'autres framework mieux que LangChain.
-Personne 3 : En entrée une main et l'état de la game et en sortie le pourcentage de gagner avec ça
+### Env variables
+
+Make sure you have a `.env` file, based on the example provided.
+
+### Run with Docker (recommended)
+
+```bash
+docker compose up --build
+```
+
+Then access:
+- Frontend: `http://localhost:5173`
+- Neo4j Browser: `http://localhost:7474`
